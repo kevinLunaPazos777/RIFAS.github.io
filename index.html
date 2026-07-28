@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteos y Rifas Premium</title>
+    <!-- Tipografía Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Conexión a CSS (el ?v=3 obliga al navegador a bajar la versión NUEVA) -->
+    <link rel="stylesheet" href="estilos.css?v=3">
+</head>
+<body>
+
+    <!-- Notificación Toast -->
+    <div id="toast">Notificación</div>
+
+    <!-- WhatsApp Flotante -->
+    <a href="https://wa.me/522321270910?text=Hola,%20tengo%20una%20duda" class="whatsapp-btn" target="_blank">
+        💬 ¿Dudas?
+    </a>
+
+    <!-- Modal Términos y Condiciones -->
+    <div id="modal-terminos" class="modal hidden">
+        <div class="modal-content">
+            <h3>📜 Términos y Condiciones</h3>
+            <p>1. El sorteo se realizará en la fecha establecida o al completarse el 100% de los boletos vendidos. Si al llegar la fecha establecida no se ha concluido con la venta del 100% de los boletos, la fecha del sorteo se aplazará 10 días más; este proceso se repetirá de forma sucesiva hasta cumplir un plazo máximo de 1 mes. En caso de cumplirse dicho mes y no concluir con el total de los boletos vendidos, la rifa se llevará a cabo de manera definitiva con los números participantes.</p>
+            <p>2. Al apartar tus números, cuentas con un tiempo razonable para realizar tu pago y enviar tu comprobante por WhatsApp.</p>
+            <p>3. Los números no pagados en tiempo podrán ser liberados nuevamente para otros participantes.</p>
+            <p>4. En caso de solicitar el reembolso de alguno o varios boletos por motivos personales, se realizará la devolución únicamente del 50% del valor total pagado por dichos boletos.</p>
+            <p>5. El número ganador coincidirá fielmente con los resultados oficiales del sorteo correspondiente.</p>
+            <button type="button" class="btn-participar" onclick="cerrarTerminos()" style="margin-top: 15px;">Entendido</button>
+        </div>
+    </div>
+
+    <!-- Modal Contraseña de Administrador -->
+    <div id="modal-admin" class="modal hidden">
+        <div class="modal-content" style="max-width: 350px;">
+            <h3>🔒 Acceso Administrador</h3>
+            <div class="input-group">
+                <label>Contraseña</label>
+                <input type="password" id="admin-pass-input" placeholder="Escribe tu contraseña" onkeydown="if(event.key==='Enter') verificarPassAdmin();">
+            </div>
+            <button type="button" class="btn-participar" onclick="verificarPassAdmin()">Entrar</button>
+            <button type="button" class="btn-volver" onclick="cerrarModalAdmin()" style="margin-top: 10px;">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- Modal Confirmar Liberación -->
+    <div id="modal-liberar" class="modal hidden">
+        <div class="modal-content" style="max-width: 350px; text-align: center;">
+            <h3>🔓 Liberar número</h3>
+            <p id="texto-liberar" style="white-space: pre-line;">¿Liberar este número?</p>
+            <button type="button" class="btn-participar" onclick="confirmarLiberacion()">Sí, liberarlo</button>
+            <button type="button" class="btn-volver" onclick="cerrarModalLiberar()" style="margin-top: 10px;">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- SECCIÓN MENÚ PRINCIPAL -->
+    <div id="seccion-menu" class="container fade-in">
+        <h1>🎉 Sorteos Premium</h1>
+        <p>Gana increíbles premios con total seguridad y transparencia.</p>
+
+        <!-- Cuenta Regresiva -->
+        <div class="countdown-container">
+            <div class="countdown-box"><span id="dias">00</span><small>Días</small></div>
+            <div class="countdown-box"><span id="horas">00</span><small>Horas</small></div>
+            <div class="countdown-box"><span id="minutos">00</span><small>Min</small></div>
+            <div class="countdown-box"><span id="segundos">00</span><small>Seg</small></div>
+        </div>
+
+        <!-- Tarjeta Rifa 1 -->
+        <div class="rifa-card">
+            <!-- 👇 AQUÍ PONES TU FOTO 👇 -->
+            <img src="iphone.jpg" alt="iPhone 15" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+
+            <h2>📱 Rifa de un iPhone 15</h2>
+            <p>🎁 Promoción: 1x$50 | 3x$135 | 5x$200</p>
+            <button class="btn-participar" onclick="abrirRifa('iphone', '📱 Rifa de un iPhone 15')">Participar Ahora</button>
+        </div>
+
+        <br>
+
+        <!-- Tarjeta Rifa 2 -->
+        <div class="rifa-card">
+            <!-- 👇 AQUÍ PONES TU FOTO 👇 -->
+            <img src="moto.jpg" alt="Moto Italika" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+
+            <h2>🏍️ Rifa Moto Italika</h2>
+            <p>🎁 Promoción: 1x$100 | 3x$250 | 5x$400</p>
+            <button class="btn-participar" onclick="abrirRifa('moto', '🏍️ Rifa Moto Italika')">Participar Ahora</button>
+        </div>
+
+    </div>
+
+    <!-- SECCIÓN DE LA RIFA (CUADRÍCULA Y FORMULARIO) -->
+    <div id="seccion-rifa" class="container hidden">
+        <button class="btn-volver" onclick="volverAlMenu()">← Volver al Menú Principal</button>
+
+        <!-- PANEL DE ADMINISTRADOR -->
+        <div class="admin-bar">
+            <button type="button" class="btn-admin" onclick="entrarAdmin()">🔒 Admin</button>
+            <div id="aviso-admin" class="aviso-admin hidden">
+                🔧 MODO ADMINISTRADOR: toca un número gris para LIBERARLO. Toca "🔒 Admin" otra vez para salir.
+            </div>
+        </div>
+
+        <h2 id="titulo-rifa-activa" style="margin-top: 20px;"></h2>
+        <p>Toca los números que deseas apartar.</p>
+
+        <!-- Barra de progreso -->
+        <div class="progress-container">
+            <div id="barra-progreso" class="progress-bar"></div>
+        </div>
+        <p id="texto-progreso" class="texto-progreso">Calculando ventas...</p>
+
+        <p id="cargando">Cargando números disponibles... ⏳</p>
+
+        <!-- Cuadrícula de números -->
+        <div id="grid-numeros" class="grid hidden"></div>
+
+        <!-- Formulario (Oculto hasta que elija números) -->
+        <div id="formulario-section" class="form-container hidden fade-in">
+            <h3>Tus números: <span id="num-elegido" class="highlight"></span></h3>
+            <h3>Total a pagar: $<span id="total-pagar" class="highlight-total"></span> MXN</h3>
+
+            <div class="cuentas-pago">
+                <p>💳 <strong>Cuentas Autorizadas para Pago:</strong></p>
+                <p>BBVA: <span id="cuenta-bbva">1234567890123456</span> <button type="button" class="btn-copiar" onclick="copiarTexto('cuenta-bbva')">Copiar</button></p>
+                <p>OXXO: <span id="cuenta-oxxo">9876543210987654</span> <button type="button" class="btn-copiar" onclick="copiarTexto('cuenta-oxxo')">Copiar</button></p>
+                <small>
+                    Realiza tu pago, guarda tu foto del comprobante y llena este formulario.<br>
+                    En caso de dudas, contáctanos por WhatsApp.<br>
+                    En Motivo o Concepto (agrega tu Nombre completo y Números Apartados) y envía tu comprobante por WhatsApp.
+                </small>
+            </div>
+
+            <form id="form-rifa">
+                <div class="input-group">
+                    <label>Nombre(s)</label>
+                    <input type="text" id="nombre" required placeholder="Tu nombre">
+                </div>
+                <div class="input-group">
+                    <label>Apellidos</label>
+                    <input type="text" id="apellidos" required placeholder="Tus apellidos">
+                </div>
+                <div class="input-group">
+                    <label>Teléfono (10 dígitos)</label>
+                    <input type="tel" id="telefono" required maxlength="10" placeholder="Ej: 5512345678">
+                </div>
+                <div class="input-group">
+                    <label>Edad</label>
+                    <input type="number" id="edad" required placeholder="Tu edad" min="1" max="120">
+                </div>
+                <div class="input-group">
+                    <label>Dirección</label>
+                    <textarea id="direccion" required placeholder="Calle, número, colonia, ciudad"></textarea>
+                </div>
+                <div class="terms-group">
+                    <input type="checkbox" id="terminos">
+                    <label for="terminos">Acepto los <a href="#" onclick="abrirTerminos(event)">términos y condiciones</a></label>
+                </div>
+                <button type="submit" class="submit btn-participar">Apartar Boletos y Enviar WhatsApp</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Conexión a JavaScript (el ?v=3 obliga al navegador a bajar la versión NUEVA) -->
+    <script src="app.js?v=3"></script>
+</body>
+</html>
